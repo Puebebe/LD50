@@ -3,21 +3,19 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    public bool isLeft;
-    private GameActions controls;
-    private Rigidbody rb;
+    [SerializeField]
+    private Rigidbody leftSki, rightSki;
     [SerializeField]
     private int force = 10;
+
+    private GameActions controls;
 
     private void Awake()
     {
         controls = new GameActions();
         controls.Enable();
-    }
-
-    private void Start()
-    {
-        rb = GetComponent<Rigidbody>();
+        if (!rightSki)
+            rightSki = leftSki;
     }
 
     private void FixedUpdate()
@@ -27,16 +25,25 @@ public class PlayerController : MonoBehaviour
 
     public void Move()
     {
-        var input = isLeft ? controls.Player.MoveLeft.ReadValue<Vector2>() : controls.Player.MoveRight.ReadValue<Vector2>();
-        var inputForce = new Vector3(input.x * force, 0, input.y * force);
+        var leftInput = controls.Player.MoveLeft.ReadValue<Vector2>();
+        var rightInput = controls.Player.MoveRight.ReadValue<Vector2>();
+        var leftInputForce = new Vector3(leftInput.x * force, 0, leftInput.y * force);
+        var rightInputForce = new Vector3(rightInput.x * force, 0, rightInput.y * force);
 
         // Player should not "slide up"
-        if (rb.velocity.z <= 0)
+        if (leftSki.velocity.z <= 0)
         {
-            rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y, 0);
-            inputForce.z = 0;
+            leftSki.velocity = new Vector3(leftSki.velocity.x, leftSki.velocity.y, 0);
+            leftInputForce.z = 0;
         }
 
-        rb.AddRelativeForce(inputForce);
+        if (rightSki.velocity.z <= 0)
+        {
+            rightSki.velocity = new Vector3(rightSki.velocity.x, rightSki.velocity.y, 0);
+            rightInputForce.z = 0;
+        }
+
+        leftSki.AddRelativeForce(leftInputForce);
+        rightSki.AddRelativeForce(rightInputForce);
     }
 }
