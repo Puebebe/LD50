@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour
 {
     private GameActions controls;
     private Rigidbody rb;
+    [SerializeField]
     private int force = 10;
 
     private void Awake()
