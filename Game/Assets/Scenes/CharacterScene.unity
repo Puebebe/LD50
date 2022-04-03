@@ -6166,10 +6166,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 40282718, guid: 94796d8e08015fe4388b0cb012ea7183, type: 3}
-      propertyPath: force
-      value: 500
-      objectReference: {fileID: 0}
     - target: {fileID: 1181759138072800869, guid: 94796d8e08015fe4388b0cb012ea7183, type: 3}
       propertyPath: m_Name
       value: CharacterSkier
@@ -6217,14 +6213,6 @@ PrefabInstance:
     - target: {fileID: 1958400634853455071, guid: 94796d8e08015fe4388b0cb012ea7183, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9072209179699104821, guid: 94796d8e08015fe4388b0cb012ea7183, type: 3}
-      propertyPath: m_Mass
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 9072209179790544478, guid: 94796d8e08015fe4388b0cb012ea7183, type: 3}
-      propertyPath: m_Mass
-      value: 50
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 94796d8e08015fe4388b0cb012ea7183, type: 3}
