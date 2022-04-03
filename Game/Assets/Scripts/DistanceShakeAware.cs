@@ -26,6 +26,5 @@ public class DistanceShakeAware : MonoBehaviour
         var distance = Vector3.Distance(transform.position, referenceGameObject.transform.position);
         var progressToShakeLoose = Mathf.Max(1 - distance / zeroShakeDistance, 0f);
         multiChannelPerlin.m_AmplitudeGain = shakeLooseCurve.Evaluate(progressToShakeLoose);
-        Debug.Log("distance=" + distance + ", shake=" + progressToShakeLoose);
     }
 }
