@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    public bool isLeft;
     private GameActions controls;
     private Rigidbody rb;
     [SerializeField]
@@ -26,7 +27,7 @@ public class PlayerController : MonoBehaviour
 
     public void Move()
     {
-        var input = controls.Player.Move.ReadValue<Vector2>();
+        var input = isLeft ? controls.Player.MoveLeft.ReadValue<Vector2>() : controls.Player.MoveRight.ReadValue<Vector2>();
         var inputForce = new Vector3(input.x * force, 0, input.y * force);
 
         // Player should not "slide up"
@@ -36,6 +37,6 @@ public class PlayerController : MonoBehaviour
             inputForce.z = 0;
         }
 
-        rb.AddForce(inputForce);
+        rb.AddRelativeForce(inputForce);
     }
 }
