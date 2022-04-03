@@ -45,5 +45,10 @@ public class PlayerController : MonoBehaviour
 
         leftSki.AddRelativeForce(leftInputForce);
         rightSki.AddRelativeForce(rightInputForce);
+        
+        leftSki.AddRelativeTorque(new Vector3(0, leftInput.x / 10, 0), ForceMode.VelocityChange);
+        rightSki.AddRelativeTorque(new Vector3(0, rightInput.x / 10, 0), ForceMode.VelocityChange);
+
+        //Debug.Log(leftSki.rotation.eulerAngles);
     }
 }
