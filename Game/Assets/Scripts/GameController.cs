@@ -10,6 +10,7 @@ public class GameController : MonoBehaviour
     void GameOver()
     {
         Debug.LogWarning("Game over!");
+        FindObjectOfType<UIController>().SetGameOverScreen(true);
     }
 
     void OnDestroy()
