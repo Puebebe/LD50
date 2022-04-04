@@ -11,43 +11,50 @@ public class TerrainGenerator : MonoBehaviour
     [SerializeField]
     private int drawDistance = 20;
     [SerializeField]
-    private Transform location;
+    private Transform center;
 
 
     private MeshCollider meshCollider;
     private Mesh mesh;
     private Vector3[] vertices;
     private int[] triangles;
+    private float lastZLocation;
 
-    // Start is called before the first frame update
     void Start()
     {
         meshCollider = GetComponent<MeshCollider>();
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
 
-        CreateShape();
+        CreateShiftedVertices();
+        CreateTriangles();
         UpdateMesh();
     }
 
-    void CreateShape()
+    void CreateShiftedVertices(float shift = 0)
     {
-        vertices = new Vector3[(xSize + 1) * (drawDistance + 1)];
+        vertices = new Vector3[(xSize + 1) * (2 * drawDistance + 1)];
 
-        for (int i = 0, z = 0; z <= drawDistance; z++)
+        for (int i = 0, z = -drawDistance; z <= drawDistance; z++)
         {
             for (int x = 0; x <= xSize; x++)
             {
-                float y = Mathf.PerlinNoise(x * 0.3f, z * 0.3f);
-                vertices[i] = new Vector3(x, y, z);
+                float shiftedZ = z + shift;
+                float y = Mathf.PerlinNoise(x * 0.3f, shiftedZ * 0.3f);
+                vertices[i] = new Vector3(x, y, shiftedZ);
                 i++;
             }
         }
 
-        triangles = new int[xSize * drawDistance * 6];
+        lastZLocation = center.position.z;
+    }
+
+    void CreateTriangles()
+    {
+        triangles = new int[xSize * 2 * drawDistance * 6];
         int vert = 0;
         int tris = 0;
-        for (int z = 0; z < drawDistance; z++)
+        for (int z = -drawDistance; z < drawDistance; z++)
         {
             for (int x = 0; x < xSize; x++)
             {
@@ -76,9 +83,18 @@ public class TerrainGenerator : MonoBehaviour
         meshCollider.sharedMesh = mesh;
     }
 
-    // Update is called once per frame
     void Update()
     {
+        UpdateVertices();
+        UpdateMesh();
+    }
 
+    void UpdateVertices()
+    {
+        var shiftZ = (int)(center.position.z - lastZLocation);
+        if (shiftZ == 0) return;
+
+        var totalShiftZ = (int)(center.position.z - transform.position.z);
+        CreateShiftedVertices(totalShiftZ);
     }
 }
