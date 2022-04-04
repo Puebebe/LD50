@@ -14,6 +14,10 @@ public class TerrainGenerator : MonoBehaviour
     private float scale = 1;
     [SerializeField]
     private Transform center;
+    [SerializeField]
+    private GameObject obstacle;
+    [SerializeField]
+    private float segmentLength = 10;
 
 
     private MeshCollider meshCollider;
@@ -21,6 +25,7 @@ public class TerrainGenerator : MonoBehaviour
     private Vector3[] vertices;
     private int[] triangles;
     private float lastZLocation;
+    private List<List<GameObject>> segmentsObstacles = new List<List<GameObject>>();
 
     void Start()
     {
@@ -48,7 +53,6 @@ public class TerrainGenerator : MonoBehaviour
                 i++;
             }
         }
-
         lastZLocation = center.position.z;
     }
 
@@ -90,6 +94,8 @@ public class TerrainGenerator : MonoBehaviour
     {
         UpdateVertices();
         UpdateMesh();
+        PlaceObstacles();
+        RemoveFarObstacles();
     }
 
     void UpdateVertices()
@@ -99,5 +105,39 @@ public class TerrainGenerator : MonoBehaviour
 
         var totalShiftZ = (int)(center.position.z - transform.position.z);
         CreateShiftedVertices(totalShiftZ);
+    }
+
+    void PlaceObstacles()
+    {
+        if (center.position.z - transform.position.z > segmentLength * segmentsObstacles.Count)
+        {
+            var startZ = segmentLength * segmentsObstacles.Count + drawDistance;
+            var endZ = startZ + segmentLength;
+            var halfWidth = xSize / 2;
+
+            var height = (int)segmentLength;
+
+            var obstaclesToPlace = segmentsObstacles.Count / 10 + 1;
+            var placedObstacles = new List<GameObject>(obstaclesToPlace);
+            for (int i = 0; i < obstaclesToPlace; i++)
+            {
+                placedObstacles.Add(GameObject.Instantiate(obstacle, new Vector3(UnityEngine.Random.Range(-halfWidth, halfWidth), transform.position.y, UnityEngine.Random.Range(startZ, endZ)), Quaternion.identity));
+            }
+            segmentsObstacles.Add(placedObstacles);
+
+            var removeCount = (int)(2 * drawDistance / segmentLength + 1);
+            if (segmentsObstacles.Count > removeCount)
+            {
+                foreach (var obstacle in segmentsObstacles[segmentsObstacles.Count - removeCount - 1])
+                {
+                    GameObject.Destroy(obstacle);
+                }
+            }
+        }
+    }
+
+    void RemoveFarObstacles()
+    {
+
     }
 }
