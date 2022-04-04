@@ -11,6 +11,8 @@ public class TerrainGenerator : MonoBehaviour
     [SerializeField]
     private int drawDistance = 20;
     [SerializeField]
+    private float scale = 1;
+    [SerializeField]
     private Transform center;
 
 
@@ -35,13 +37,13 @@ public class TerrainGenerator : MonoBehaviour
     {
         vertices = new Vector3[(xSize + 1) * (2 * drawDistance + 1)];
 
-        var xSizeHalf = xSize /2;
+        var xSizeHalf = xSize / 2;
         for (int i = 0, z = -drawDistance; z <= drawDistance; z++)
         {
+            float shiftedZ = z + shift;
             for (int x = -xSizeHalf; x <= xSizeHalf; x++)
             {
-                float shiftedZ = z + shift;
-                float y = Mathf.PerlinNoise(x * 0.3f, shiftedZ * 0.3f);
+                float y = Mathf.PerlinNoise(x * scale, shiftedZ * scale);
                 vertices[i] = new Vector3(x, y, shiftedZ);
                 i++;
             }
