@@ -454,6 +454,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftSki: {fileID: 9072209179699104821}
   rightSki: {fileID: 9072209179790544478}
+  leftSkiJoint: {fileID: 9072209179445613663}
+  rightSkiJoint: {fileID: 9072209180358056576}
   force: 500
 --- !u!1 &1327319197208424770
 GameObject:

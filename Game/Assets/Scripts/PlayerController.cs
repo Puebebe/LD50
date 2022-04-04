@@ -6,6 +6,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private Rigidbody leftSki, rightSki;
     [SerializeField]
+    private Joint leftSkiJoint, rightSkiJoint;
+    [SerializeField]
     private int force = 10;
 
     private GameActions controls;
@@ -16,6 +18,11 @@ public class PlayerController : MonoBehaviour
         controls.Enable();
         if (!rightSki)
             rightSki = leftSki;
+    }
+
+    private void Start()
+    {
+        Avalanche.OnCatchUpWithPlayer += DetachSkis;
     }
 
     private void FixedUpdate()
@@ -59,5 +66,16 @@ public class PlayerController : MonoBehaviour
             rightSkiRotation.eulerAngles = new Vector3(rightSkiRotation.x, newRotationY, rightSkiRotation.z);
         }
         rightSki.rotation = rightSkiRotation;
+    }
+
+    public void DetachSkis()
+    {
+        leftSkiJoint.breakForce = 1;
+        rightSkiJoint.breakForce = 1;
+    }
+
+    private void OnDestroy()
+    {
+        Avalanche.OnCatchUpWithPlayer -= DetachSkis;
     }
 }
