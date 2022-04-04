@@ -35,9 +35,10 @@ public class TerrainGenerator : MonoBehaviour
     {
         vertices = new Vector3[(xSize + 1) * (2 * drawDistance + 1)];
 
+        var xSizeHalf = xSize /2;
         for (int i = 0, z = -drawDistance; z <= drawDistance; z++)
         {
-            for (int x = 0; x <= xSize; x++)
+            for (int x = -xSizeHalf; x <= xSizeHalf; x++)
             {
                 float shiftedZ = z + shift;
                 float y = Mathf.PerlinNoise(x * 0.3f, shiftedZ * 0.3f);
