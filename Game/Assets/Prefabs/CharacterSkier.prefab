@@ -644,7 +644,7 @@ Rigidbody:
   m_Mass: 12.5
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 0
+  m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
@@ -2152,10 +2152,10 @@ FixedJoint:
   m_GameObject: {fileID: 8656853519210762194}
   m_ConnectedBody: {fileID: 9072209179699104821}
   m_ConnectedArticulationBody: {fileID: 0}
-  m_BreakForce: Infinity
+  m_BreakForce: 3000
   m_BreakTorque: Infinity
   m_EnableCollision: 0
-  m_EnablePreprocessing: 1
+  m_EnablePreprocessing: 0
   m_MassScale: 1
   m_ConnectedMassScale: 1
 --- !u!1 &8825360354521137879
@@ -2308,10 +2308,10 @@ FixedJoint:
   m_GameObject: {fileID: 8995028240734363116}
   m_ConnectedBody: {fileID: 9072209179790544478}
   m_ConnectedArticulationBody: {fileID: 0}
-  m_BreakForce: Infinity
+  m_BreakForce: 3000
   m_BreakTorque: Infinity
   m_EnableCollision: 0
-  m_EnablePreprocessing: 1
+  m_EnablePreprocessing: 0
   m_MassScale: 1
   m_ConnectedMassScale: 1
 --- !u!1001 &9072209180492750920
@@ -2395,7 +2395,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 32
+  m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!65 &986697282
 BoxCollider:
@@ -2507,7 +2507,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 32
+  m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!65 &1833738313
 BoxCollider:

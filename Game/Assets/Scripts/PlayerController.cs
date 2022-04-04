@@ -45,27 +45,19 @@ public class PlayerController : MonoBehaviour
 
         leftSki.AddRelativeForce(leftInputForce);
         rightSki.AddRelativeForce(rightInputForce);
-        
-        leftSki.AddRelativeTorque(new Vector3(0, leftInput.x / 10, 0), ForceMode.VelocityChange);
-        rightSki.AddRelativeTorque(new Vector3(0, rightInput.x / 10, 0), ForceMode.VelocityChange);
-        
+
         var leftSkiRotation = leftSki.rotation;
-        if (leftSkiRotation.eulerAngles.y > 45 && leftSkiRotation.eulerAngles.y < 315)
         {
-            var leftSkiRotationBoundary = (leftSkiRotation.eulerAngles.y - 135) < 0 ? 45 : 315;
-            leftSkiRotation.eulerAngles = new Vector3(leftSkiRotation.x, leftSkiRotationBoundary, leftSkiRotation.z);
+            var newRotationY = leftSkiRotation.y + leftSki.velocity.x * 5;
+            leftSkiRotation.eulerAngles = new Vector3(leftSkiRotation.x, newRotationY, leftSkiRotation.z);
         }
         leftSki.rotation = leftSkiRotation;
 
         var rightSkiRotation = rightSki.rotation;
-        if (rightSkiRotation.eulerAngles.y > 45 && rightSkiRotation.eulerAngles.y < 315)
         {
-            var rightSkiRotationBoundary = (rightSkiRotation.eulerAngles.y - 135) < 0 ? 45 : 315;
-            rightSkiRotation.eulerAngles = new Vector3(rightSkiRotation.x, rightSkiRotationBoundary, rightSkiRotation.z);
+            var newRotationY = rightSkiRotation.y + rightSki.velocity.x * 5;
+            rightSkiRotation.eulerAngles = new Vector3(rightSkiRotation.x, newRotationY, rightSkiRotation.z);
         }
         rightSki.rotation = rightSkiRotation;
-
-        //Debug.Log(leftSki.rotation.eulerAngles);
-        //Debug.Log(rightSki.rotation.eulerAngles);
     }
 }
