@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,6 +16,16 @@ public class TerrainGenerator : MonoBehaviour
     private GameObject obstacle;
     [SerializeField]
     private float segmentLength = 10;
+    [SerializeField]
+    private int generateSegmentLength = 10;
+    [SerializeField]
+    private int minDeformationWidth = 10;
+    [SerializeField]
+    private int minDeformationLength = 10;
+    [SerializeField]
+    private float deformationMaxHeight = 2;
+    [SerializeField, Range(0f, 1f)]
+    private float deformationPropability = 0.5f;
 
 
     private MeshCollider meshCollider;
@@ -106,11 +114,45 @@ public class TerrainGenerator : MonoBehaviour
     private void UpdateVertices()
     {
         var shiftZ = (int)(center.position.z - lastZLocation);
-        if (shiftZ < 1f) return;
+        if (shiftZ < generateSegmentLength) return;
 
         ShiftVerticesBy(shiftZ);
         GenerateVertices(2 * drawDistance - shiftZ);
+        if (Random.Range(0f, 1f) <= deformationPropability)
+        {
+            GenerateDeformation(2 * drawDistance - shiftZ);
+        }
         UpdateLastLocation();
+    }
+
+    private void GenerateDeformation(int fromRow)
+    {
+        var positionZ = (int)center.position.z;
+        var xSizeHalf = xSize / 2;
+        var startIndex = fromRow * (xSize + 1);
+        var deformationStartX = (int)Random.Range(transform.position.x - xSizeHalf, transform.position.x + xSizeHalf - minDeformationWidth);
+        var deformationEndX = (int)Random.Range(deformationStartX + minDeformationWidth, transform.position.x + xSizeHalf);
+        var deformationStartZ = (int)Random.Range(positionZ - drawDistance + fromRow, positionZ + drawDistance - minDeformationLength);
+        var deformationEndZ = (int)Random.Range(deformationStartZ + minDeformationLength, positionZ + drawDistance);
+        var deformationHeight = Random.Range(-deformationMaxHeight, deformationMaxHeight);
+
+        var indexPreIndent = deformationStartX - ((int)transform.position.x - xSizeHalf);
+        var indexPostIndent = ((int)transform.position.x + xSizeHalf) - deformationEndX;
+        var deformationStepZ = Mathf.PI / (deformationEndZ - deformationStartZ);
+        var currentDeformationZ = 0f;
+        for (int i = startIndex + indexPreIndent, z = deformationStartZ; z <= deformationEndZ; z++)
+        {
+            var deformationStepX = Mathf.PI / (deformationEndX - deformationStartX);
+            var currentDeformationX = 0f;
+            for (int x = deformationStartX; x <= deformationEndX; x++)
+            {
+                vertices[i] += new Vector3(0, Mathf.Sin(currentDeformationX) * Mathf.Sin(currentDeformationZ) * deformationHeight, 0);
+                i++;
+                currentDeformationX += deformationStepX;
+            }
+            i += indexPostIndent + indexPreIndent;
+            currentDeformationZ += deformationStepZ;
+        }
     }
 
     private void ShiftVerticesBy(int shift)
