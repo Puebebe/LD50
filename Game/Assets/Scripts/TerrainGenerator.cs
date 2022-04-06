@@ -15,9 +15,7 @@ public class TerrainGenerator : MonoBehaviour
     [SerializeField]
     private GameObject obstacle;
     [SerializeField]
-    private float segmentLength = 10;
-    [SerializeField]
-    private int generateSegmentLength = 10;
+    private int generateChunkLength = 10;
     [SerializeField]
     private int minDeformationWidth = 10;
     [SerializeField]
@@ -105,17 +103,17 @@ public class TerrainGenerator : MonoBehaviour
 
     void Update()
     {
-        UpdateVertices();
+        var shiftZ = (int)(center.position.z - lastZLocation);
+        if (shiftZ < generateChunkLength) return;
+
+        UpdateVertices(shiftZ);
         UpdateMesh();
         UpdateObstacles();
         RemoveFarObstacles();
     }
 
-    private void UpdateVertices()
+    private void UpdateVertices(int shiftZ)
     {
-        var shiftZ = (int)(center.position.z - lastZLocation);
-        if (shiftZ < generateSegmentLength) return;
-
         ShiftVerticesBy(shiftZ);
         GenerateVertices(2 * drawDistance - shiftZ);
         if (Random.Range(0f, 1f) <= deformationPropability)
@@ -165,7 +163,7 @@ public class TerrainGenerator : MonoBehaviour
 
     private void UpdateObstacles()
     {
-        if (center.position.z - transform.position.z > segmentLength * segmentsObstacles.Count)
+        if (center.position.z - transform.position.z > generateChunkLength * (segmentsObstacles.Count + 1))
         {
             PlaceObstacles();
             RemoveFarObstacles();
@@ -174,24 +172,34 @@ public class TerrainGenerator : MonoBehaviour
 
     private void PlaceObstacles()
     {
-        var startZ = segmentLength * segmentsObstacles.Count + drawDistance;
-        var endZ = startZ + segmentLength;
+        var startZ = (int)center.position.z + drawDistance - generateChunkLength;
+        var endZ = startZ + generateChunkLength;
         var halfWidth = xSize / 2;
 
-        var height = (int)segmentLength;
+        var height = (int)generateChunkLength;
 
         var obstaclesToPlace = segmentsObstacles.Count / 10 + 1;
         var placedObstacles = new List<GameObject>(obstaclesToPlace);
         for (int i = 0; i < obstaclesToPlace; i++)
         {
-            placedObstacles.Add(GameObject.Instantiate(obstacle, new Vector3(UnityEngine.Random.Range(-halfWidth, halfWidth), transform.position.y, UnityEngine.Random.Range(startZ, endZ)), Quaternion.identity));
+            var x = Random.Range(-halfWidth, halfWidth);
+            var z = Random.Range(startZ, endZ);
+            var y = GetVertexPositionAt(x, z).y;
+            placedObstacles.Add(GameObject.Instantiate(obstacle, new Vector3(x, y, z), Quaternion.identity));
         }
         segmentsObstacles.Add(placedObstacles);
     }
 
+    private Vector3 GetVertexPositionAt(int x, int z)
+    {
+        var meshStart = transform.TransformPoint(mesh.bounds.min);
+        var vertex = vertices[(z - (int)meshStart.z) * (xSize + 1) + (x - (int)meshStart.x)];
+        return transform.TransformPoint(vertex);
+    }
+
     private void RemoveFarObstacles()
     {
-        var removeCount = (int)(2 * drawDistance / segmentLength + 1);
+        var removeCount = (int)(2 * drawDistance / generateChunkLength + 1);
         if (segmentsObstacles.Count > removeCount)
         {
             foreach (var obstacle in segmentsObstacles[segmentsObstacles.Count - removeCount - 1])
