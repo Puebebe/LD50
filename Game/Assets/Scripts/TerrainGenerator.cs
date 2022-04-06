@@ -32,31 +32,36 @@ public class TerrainGenerator : MonoBehaviour
         meshCollider = GetComponent<MeshCollider>();
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
+        vertices = new Vector3[(xSize + 1) * (2 * drawDistance + 1)];
 
-        CreateShiftedVertices();
+        GenerateVertices(0);
+        UpdateLastLocation();
         CreateTriangles();
         UpdateMesh();
     }
 
-    void CreateShiftedVertices(float shift = 0)
+    private void GenerateVertices(int fromRow)
     {
-        vertices = new Vector3[(xSize + 1) * (2 * drawDistance + 1)];
-
+        var positionZ = (int)center.position.z;
         var xSizeHalf = xSize / 2;
-        for (int i = 0, z = -drawDistance; z <= drawDistance; z++)
+        var startZ = fromRow * (xSize + 1);
+        for (int i = startZ, z = positionZ - drawDistance + fromRow; z <= positionZ + drawDistance; z++)
         {
-            float shiftedZ = z + shift;
             for (int x = -xSizeHalf; x <= xSizeHalf; x++)
             {
-                float y = Mathf.PerlinNoise(x * scale, shiftedZ * scale);
-                vertices[i] = new Vector3(x, y, shiftedZ);
+                float y = Mathf.PerlinNoise(x * scale, z * scale);
+                vertices[i] = new Vector3(x, y, z);
                 i++;
             }
         }
+    }
+
+    private void UpdateLastLocation()
+    {
         lastZLocation = center.position.z;
     }
 
-    void CreateTriangles()
+    private void CreateTriangles()
     {
         triangles = new int[xSize * 2 * drawDistance * 6];
         int vert = 0;
@@ -94,50 +99,63 @@ public class TerrainGenerator : MonoBehaviour
     {
         UpdateVertices();
         UpdateMesh();
-        PlaceObstacles();
+        UpdateObstacles();
         RemoveFarObstacles();
     }
 
-    void UpdateVertices()
+    private void UpdateVertices()
     {
         var shiftZ = (int)(center.position.z - lastZLocation);
-        if (shiftZ == 0) return;
+        if (shiftZ < 1f) return;
 
-        var totalShiftZ = (int)(center.position.z - transform.position.z);
-        CreateShiftedVertices(totalShiftZ);
+        ShiftVerticesBy(shiftZ);
+        GenerateVertices(2 * drawDistance - shiftZ);
+        UpdateLastLocation();
     }
 
-    void PlaceObstacles()
+    private void ShiftVerticesBy(int shift)
     {
-        if (center.position.z - transform.position.z > segmentLength * segmentsObstacles.Count)
+        for (int i = 0, j = shift * (xSize + 1); j < vertices.Length; j++, i++)
         {
-            var startZ = segmentLength * segmentsObstacles.Count + drawDistance;
-            var endZ = startZ + segmentLength;
-            var halfWidth = xSize / 2;
-
-            var height = (int)segmentLength;
-
-            var obstaclesToPlace = segmentsObstacles.Count / 10 + 1;
-            var placedObstacles = new List<GameObject>(obstaclesToPlace);
-            for (int i = 0; i < obstaclesToPlace; i++)
-            {
-                placedObstacles.Add(GameObject.Instantiate(obstacle, new Vector3(UnityEngine.Random.Range(-halfWidth, halfWidth), transform.position.y, UnityEngine.Random.Range(startZ, endZ)), Quaternion.identity));
-            }
-            segmentsObstacles.Add(placedObstacles);
-
-            var removeCount = (int)(2 * drawDistance / segmentLength + 1);
-            if (segmentsObstacles.Count > removeCount)
-            {
-                foreach (var obstacle in segmentsObstacles[segmentsObstacles.Count - removeCount - 1])
-                {
-                    GameObject.Destroy(obstacle);
-                }
-            }
+            vertices[i] = vertices[j];
         }
     }
 
-    void RemoveFarObstacles()
+    private void UpdateObstacles()
     {
+        if (center.position.z - transform.position.z > segmentLength * segmentsObstacles.Count)
+        {
+            PlaceObstacles();
+            RemoveFarObstacles();
+        }
+    }
 
+    private void PlaceObstacles()
+    {
+        var startZ = segmentLength * segmentsObstacles.Count + drawDistance;
+        var endZ = startZ + segmentLength;
+        var halfWidth = xSize / 2;
+
+        var height = (int)segmentLength;
+
+        var obstaclesToPlace = segmentsObstacles.Count / 10 + 1;
+        var placedObstacles = new List<GameObject>(obstaclesToPlace);
+        for (int i = 0; i < obstaclesToPlace; i++)
+        {
+            placedObstacles.Add(GameObject.Instantiate(obstacle, new Vector3(UnityEngine.Random.Range(-halfWidth, halfWidth), transform.position.y, UnityEngine.Random.Range(startZ, endZ)), Quaternion.identity));
+        }
+        segmentsObstacles.Add(placedObstacles);
+    }
+
+    private void RemoveFarObstacles()
+    {
+        var removeCount = (int)(2 * drawDistance / segmentLength + 1);
+        if (segmentsObstacles.Count > removeCount)
+        {
+            foreach (var obstacle in segmentsObstacles[segmentsObstacles.Count - removeCount - 1])
+            {
+                GameObject.Destroy(obstacle);
+            }
+        }
     }
 }
