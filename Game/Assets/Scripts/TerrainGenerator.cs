@@ -185,7 +185,7 @@ public class TerrainGenerator : MonoBehaviour
             var x = Random.Range(-halfWidth, halfWidth);
             var z = Random.Range(startZ, endZ);
             var y = GetVertexPositionAt(x, z).y;
-            placedObstacles.Add(GameObject.Instantiate(obstacle, new Vector3(x, y, z), Quaternion.identity));
+            placedObstacles.Add(GameObject.Instantiate(obstacle, new Vector3(x, y, z), obstacle.transform.rotation));
         }
         segmentsObstacles.Add(placedObstacles);
     }
